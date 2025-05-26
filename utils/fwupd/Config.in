@@ -25,18 +25,6 @@ config FWUPD_CBOR
 	help
 	  Compile fwupd with cbor protocol support
 
-config FWUPD_LZMA
-	bool "LZMA"
-	default n
-	help
-	  Compile fwupd with LZMA support
-
-config FWUPD_CURL
-	bool "curl"
-	default n
-	help
-	  Compile fwupd with curl support
-
 config FWUPD_LIBARCHIVE
 	bool "libarchive"
 	default y
@@ -49,16 +37,34 @@ config FWUPD_LIBDRM
 	help
 	  Compile fwupd with libdrm support
 
+config FWUPD_READLINE
+	bool "readline"
+	default y
+	help
+	  Compile fwupd with libreadline support
+
+config FWUPD_SQLITE
+	bool "sqlite"
+	default n
+	help
+	  Compile fwupd with SQLite support
+
+config FWUPD_GNUTLS
+	bool "gnutls"
+	default n
+	help
+	  Compile fwupd with GnuTLS support
+
+config FWUPD_PROTOBUF
+	bool "protbuf"
+	default n
+	help
+	  Compile fwupd with protobuf support
+
 config FWUPD_PLUGIN_MODEMMANAGER
 	bool "ModemManager plugin"
 	default y
 	help
 	  Compile fwupd with ModemManager plugin
-
-config FWUPD_PLUGIN_FASTBOOT
-	bool "fastboot plugin"
-	default y
-	help
-	  Compile fwupd with fastboot plugin
 
 endmenu
