@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=fwupd
-PKG_VERSION:=2.0.1
+PKG_VERSION:=2.0.14
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://github.com/fwupd/fwupd/releases/download/$(PKG_VERSION)
-PKG_HASH:=04226d0c689a56cc51de017e736f18f1f5e951b9a7c1b18e3281eb923c435891
+PKG_HASH:=3dc0bdc3b23aa7b56c3b4057e323a30db30f38b51c76b93948b1a4b5b2c833f2
 
 PKG_MAINTAINER:=Lukas Voegl <lvoegl@tdt.de>
 PKG_LICENSE:=LGPL-2.1-or-later
@@ -21,7 +21,6 @@ PKG_LICENSE_FILES:=COPYING
 PKG_CPE_ID:=cpe:/a:fwupd:fwupd
 
 PKG_BUILD_DEPENDS:= \
-	glib2/host \
 	python3/host \
 	python-packaging/host \
 	python-jinja2/host
@@ -41,13 +40,16 @@ define Package/fwupd/Default
 	+dbus \
 	+libxmlb \
 	+libjcat \
-	+libprotobuf-c \
 	+libusb-1.0 \
+	+liblzma \
+	+libsqlite3 \
+	+libcurl \
+	+zlib \
+	+FWUPD_PROTOBUF:libprotobuf-c \
 	+FWUPD_LIBARCHIVE:libarchive \
 	+FWUPD_LIBDRM:libdrm \
 	+FWUPD_CBOR:libcbor \
-	+FWUPD_LZMA:liblzma \
-	+FWUPD_CURL:libcurl \
+	+FWUPD_READLINE:libreadline \
 	+FWUPD_PLUGIN_MODEMMANAGER:modemmanager \
 	+FWUPD_PLUGIN_MODEMMANAGER:libqmi \
 	+FWUPD_PLUGIN_MODEMMANAGER:libmbim
@@ -95,7 +97,6 @@ define Package/fwupd-daemon/description
 endef
 
 MESON_ARGS += \
-	-Db_lto=true \
 	-Dbuild=all \
 	-Dpython=$(HOST_PYTHON3_BIN) \
 	-Dsupported_build=enabled \
@@ -105,7 +106,6 @@ MESON_ARGS += \
 	-Dbash_completion=false \
 	-Dfish_completion=false \
 	-Dman=false \
-	-Dconsolekit=disabled \
 	-Ddocs=disabled \
 	-Dintrospection=disabled \
 	-Dbluez=disabled \
@@ -113,55 +113,21 @@ MESON_ARGS += \
 	-Dpolkit=disabled \
 	-Dgnutls=disabled \
 	-Dpassim=disabled \
-	-Dsqlite=disabled \
-	-Dudev=enabled \
-	-Dplugin_acpi_phat=disabled \
-	-Dplugin_amdgpu=disabled \
-	-Dplugin_android_boot=disabled \
-	-Dplugin_bcm57xx=disabled \
-	-Dplugin_cfu=disabled \
-	-Dplugin_cpu=disabled \
-	-Dplugin_emmc=disabled \
-	-Dplugin_ep963x=disabled \
-	-Dplugin_gpio=disabled \
-	-Dplugin_igsc=disabled \
-	-Dplugin_kinetic_dp=disabled \
-	-Dplugin_logitech_bulkcontroller=disabled \
-	-Dplugin_logitech_scribe=disabled \
-	-Dplugin_logitech_tap=disabled \
-	-Dplugin_parade_lspcon=disabled \
-	-Dplugin_pixart_rf=disabled \
-	-Dplugin_realtek_mst=disabled \
-	-Dplugin_synaptics_mst=disabled \
-	-Dplugin_mediatek_scaler=disabled \
-	-Dplugin_synaptics_rmi=disabled \
-	-Dplugin_scsi=disabled \
-	-Dplugin_tpm=disabled \
-	-Dplugin_redfish=disabled \
-	-Dplugin_uefi_capsule=disabled \
-	-Dplugin_uefi_pk=disabled \
-	-Dplugin_nitrokey=disabled \
-	-Dplugin_nvme=disabled \
-	-Dplugin_msr=disabled \
-	-Dplugin_mtd=disabled \
+	-Dplugin_uefi_capsule_splash=false \
 	-Dplugin_flashrom=disabled \
-	-Dplugin_intel_me=disabled \
-	-Dplugin_uf2=disabled \
-	-Dplugin_upower=disabled \
-	-Dplugin_powerd=disabled \
 	-Dsystemd=disabled \
-	-Dlaunchd=disabled \
-	-Delogind=disabled \
+	-Dblkid=disabled \
+	-Dvalgrind=disabled
+	-Dreadline=$(if $(CONFIG_FWUPD_READLINE),enabled,disabled) \
 	-Dfirmware-packager=$(if $(CONFIG_FWUPD_FIRMWARE_PACKAGER),true,false) \
+	-Dprotobuf=$(if $(CONFIG_FWUPD_PROTOBUF),enabled,disabled) \
 	-Dhsi=$(if $(CONFIG_FWUPD_HSI),enabled,disabled) \
 	-Dlvfs=$(if $(CONFIG_FWUPD_LVFS),true,false) \
 	-Dcbor=$(if $(CONFIG_FWUPD_CBOR),enabled,disabled) \
-	-Dlzma=$(if $(CONFIG_FWUPD_LZMA),enabled,disabled) \
-	-Dcurl=$(if $(CONFIG_FWUPD_CURL),enabled,disabled) \
 	-Dlibarchive=$(if $(CONFIG_FWUPD_LIBARCHIVE),enabled,disabled) \
 	-Dlibdrm=$(if $(CONFIG_FWUPD_LIBDRM),enabled,disabled) \
 	-Dplugin_modem_manager=$(if $(CONFIG_FWUPD_PLUGIN_MODEMMANAGER),enabled,disabled) \
-	-Dplugin_fastboot=$(if $(CONFIG_FWUPD_PLUGIN_FASTBOOT),enabled,disabled)
+	-Dplugin_qc_firehose=$(if $(CONFIG_FWUPD_PLUGIN_MODEMMANAGER),true,false) \
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include/fwupd-3
